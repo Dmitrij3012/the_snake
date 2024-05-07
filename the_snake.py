@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 
 import pygame
 
@@ -7,7 +7,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
-CENTER_OF_SCREEN = ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
+CENTER_OF_SCREEN = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
 
 # Направления движения:
 UP = (0, -1)
@@ -57,22 +57,18 @@ class GameObject:
 class Apple(GameObject):
     """Дочерний класс Apple."""
 
-    def __init__(self, body_color=APPLE_COLOR):
+    def __init__(self, body_color=APPLE_COLOR, occupied_cells=[],
+                 position=CENTER_OF_SCREEN):
         """Инициализатор класса."""
-        super().__init__(body_color)
-        snake = Snake()
-        snake_pos = snake.positions
-        self.randomize_position(snake_pos)
+        super().__init__(body_color, position)
+        self.randomize_position(occupied_cells)
 
-    def randomize_position(self, snake_pos):
+    def randomize_position(self, occupied_cells=[]):
         """Метод отвечающий за случайное положение яблока."""
-        snake = Snake()
-        snake_pos = snake.positions
         self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                          randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
-        while self.position in snake_pos:
-            self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                             randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
+        while self.position not in occupied_cells:
+            break
 
     # Метод draw класса Apple
     def draw(self):
@@ -89,11 +85,9 @@ class Snake(GameObject):
                  position=CENTER_OF_SCREEN):
         """Инициализатор класса Snake."""
         super().__init__(body_color, position)
-        self.length = 1
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
         self.reset()
+        self.positions = position  # Если уберу, некуда будет передавать позицию змейки.(?)
         self.direction = RIGHT
-        self.next_direction = None
         self.last = None
 
     def move(self):
@@ -139,8 +133,9 @@ class Snake(GameObject):
         после столкновения c собой.
         """
         self.length = 1
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
-        self.direction = LEFT
+        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]  # Если заменяю, то сброса не происходит.
+        directions = [UP, DOWN, LEFT, RIGHT]
+        self.direction = choice(directions)
         self.next_direction = None
 
 
@@ -164,8 +159,8 @@ def handle_keys(game_object):
 def main():
     """Основная функция main."""
     pygame.init()
-    apple = Apple()
     snake = Snake()
+    apple = Apple(occupied_cells=snake.positions)
 
     while True:
         clock.tick(SPEED)
@@ -175,13 +170,12 @@ def main():
         snake.move()
         snake.update_direction()
 
-        snake_pos = snake.position
         if snake.get_head_position() == apple.position:
             snake.length += 1
-            apple.randomize_position(snake_pos)
+            apple.randomize_position(snake.positions)
         elif snake.get_head_position() in snake.positions[2:]:
             snake.reset()
-            apple.randomize_position(snake_pos)
+            apple.randomize_position(snake.positions)
 
         apple.draw()
         snake.draw()
