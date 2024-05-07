@@ -86,7 +86,8 @@ class Snake(GameObject):
         """Инициализатор класса Snake."""
         super().__init__(body_color, position)
         self.reset()
-        self.positions = position  # Если уберу, некуда будет передавать позицию змейки.(?)
+        # Если уберу, некуда будет передавать позицию змейки.(?)
+        self.positions = position
         self.direction = RIGHT
         self.last = None
 
@@ -133,7 +134,8 @@ class Snake(GameObject):
         после столкновения c собой.
         """
         self.length = 1
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]  # Если заменяю, то сброса не происходит.
+        # Если заменяю, то сброса не происходит.
+        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
         directions = [UP, DOWN, LEFT, RIGHT]
         self.direction = choice(directions)
         self.next_direction = None
