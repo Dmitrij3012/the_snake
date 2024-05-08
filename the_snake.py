@@ -7,7 +7,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
-CENTER_OF_SCREEN = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
+CENTER_OF_SCREEN = ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
 
 # Направления движения:
 UP = (0, -1)
@@ -65,10 +65,11 @@ class Apple(GameObject):
 
     def randomize_position(self, occupied_cells=[]):
         """Метод отвечающий за случайное положение яблока."""
-        self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                         randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
-        while self.position not in occupied_cells:
-            break
+        while True:
+            self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+                             randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
+            if self.position not in occupied_cells:
+                break
 
     # Метод draw класса Apple
     def draw(self):
@@ -86,8 +87,6 @@ class Snake(GameObject):
         """Инициализатор класса Snake."""
         super().__init__(body_color, position)
         self.reset()
-        # Если уберу, некуда будет передавать позицию змейки.(?)
-        self.positions = position
         self.direction = RIGHT
         self.last = None
 
@@ -134,10 +133,8 @@ class Snake(GameObject):
         после столкновения c собой.
         """
         self.length = 1
-        # Если заменяю, то сброса не происходит.
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
-        directions = [UP, DOWN, LEFT, RIGHT]
-        self.direction = choice(directions)
+        self.positions = [self.position]
+        self.direction = choice([UP, DOWN, LEFT, RIGHT])
         self.next_direction = None
 
 
